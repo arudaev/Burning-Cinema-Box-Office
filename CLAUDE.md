@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Burning Register is a web-based cinema cash register for managing inventory, orders, movies, reservations, and reporting. It is a monorepo with two services:
+Burning Register is a web-based cinema cash register operated by **Burning Cinema – Hochschulkino Deggendorf e.V.** (registered Verein, THD-affiliated) for managing inventory, orders, movies, reservations, and reporting. It is a monorepo with two services:
 
 - `services/frontend` — Vue 3 + Vuetify 3 SPA (served via Node/nginx)
 - `services/backend` — Python FastAPI + Beanie (ODM) + MongoDB
@@ -62,6 +62,15 @@ poetry install       # install deps
 poetry run python -m burningbackend   # run dev server (uvicorn with reload)
 poetry run pytest    # run tests
 ```
+
+## Docs
+
+The `docs/` directory is the ground truth for this project. Read these before making any significant change:
+
+- `docs/product.md` — scope, users, what is explicitly out of scope
+- `docs/domain.md` — domain model, German/English term mapping, core business rules
+- `docs/regulations.md` — German legal requirements (KassenSichV, DSGVO, GoBD, VAT)
+- `docs/design-foundation.md` — design principles and existing visual tokens
 
 ## Git Conventions
 
