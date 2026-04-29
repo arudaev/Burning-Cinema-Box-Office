@@ -63,6 +63,17 @@ poetry run python -m burningbackend   # run dev server (uvicorn with reload)
 poetry run pytest    # run tests
 ```
 
+## Git Conventions
+
+Branch names must follow conventional prefixes and describe the work — never reference the tool or agent:
+
+- `feature/<short-description>` — new functionality
+- `fix/<short-description>` — bug fixes
+- `docs/<short-description>` — documentation only
+- `chore/<short-description>` — tooling, config, deps
+
+Commit messages describe the change in plain terms. Do not include tool names, session IDs, or agentic attribution of any kind.
+
 ## Architecture
 
 ### Backend
