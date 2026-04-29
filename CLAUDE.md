@@ -74,14 +74,18 @@ The `docs/` directory is the ground truth for this project. Read these before ma
 
 ## Git Conventions
 
-Branch names must follow conventional prefixes and describe the work — never reference the tool or agent:
+**Authorship**: All commits are authored by `arudaev <hlexhelftd@gmail.com>`. No co-author trailers, no tool attribution, no session IDs — in commits, PR descriptions, or any document other than this file.
+
+**Branches**: All work happens on feature branches. Never commit directly to `master`.
 
 - `feature/<short-description>` — new functionality
 - `fix/<short-description>` — bug fixes
 - `docs/<short-description>` — documentation only
 - `chore/<short-description>` — tooling, config, deps
 
-Commit messages describe the change in plain terms. Do not include tool names, session IDs, or agentic attribution of any kind.
+**Pull requests**: Open a PR into `master` only when work is fully done — clean commits, no leftover TODOs, no debug code. PR titles and descriptions follow the same plain-language, attribution-free standard as commit messages.
+
+**Commit messages**: Describe the change in plain terms. Conventional prefix (`feat:`, `fix:`, `docs:`, `chore:`) followed by a short imperative summary.
 
 ## Architecture
 
