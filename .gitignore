@@ -182,3 +182,4 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .en
+docs/session.md
