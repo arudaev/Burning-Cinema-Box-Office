@@ -1,0 +1,12 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacksPlan.phases.setup]
+nixPkgs = ["python311", "poetry"]
+
+[deploy]
+startCommand = "cd services/backend && poetry run python -m burningbackend"
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

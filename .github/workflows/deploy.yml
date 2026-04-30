@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy-frontend:
+    name: Deploy frontend → Cloudflare Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: services/frontend/node_modules
+          key: bun-${{ hashFiles('services/frontend/bun.lockb') }}
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+        env:
+          VUE_APP_DB_ADDRESS: ${{ secrets.VUE_APP_DB_ADDRESS }}
+
+      - uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: burning-register
+          directory: services/frontend/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-backend:
+    name: Deploy backend → Railway
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: railwayapp/railway-action@v1
+        with:
+          command: up --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
