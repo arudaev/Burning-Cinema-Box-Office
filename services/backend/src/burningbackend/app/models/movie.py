@@ -16,18 +16,18 @@ class Movie(Document):
     description: Optional[str] = None
     language: Optional[str] = None
     poster: Optional[str] = None
-    stripe_payment: Optional[str] = None
+    active: bool = True
 
     class Settings:
         name = "movies"
 
 
 class UpdateMovie(BaseModel):
-    name: Optional[Indexed(str, unique=True)] = None
+    name: Optional[str] = None
     datetime: Optional[datetime] = None
     room: Optional[str] = None
     trailer: Optional[str] = None
     description: Optional[str] = None
     language: Optional[str] = None
     poster: Optional[str] = None
-    stripe_payment: Optional[str] = None
+    active: Optional[bool] = None
