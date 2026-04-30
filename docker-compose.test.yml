@@ -1,0 +1,20 @@
+services:
+  mongo:
+    image: mongo:7
+
+  backend:
+    build:
+      context: services/backend
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/
+      MONGODB_DB_NAME: burningregister
+      DEBUG: "false"
+      SECRET_KEY: test-secret-key-for-local-testing-only
+      FIRST_SUPERUSER: admin
+      FIRST_SUPERUSER_EMAIL: admin@example.com
+      FIRST_SUPERUSER_PASSWORD: changeme
+      CORS_ORIGINS: '["http://localhost:8080"]'
+    ports:
+      - "9090:8080"
+    depends_on:
+      - mongo

@@ -1,18 +1,18 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
 
 from burningbackend.app.core.config import settings
 from burningbackend.app import api
 from burningbackend.app.db import init_db
 
+
 @asynccontextmanager
 async def lifespan(application: FastAPI):  # noqa
     await init_db.init()
     yield
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -26,17 +26,9 @@ app = FastAPI(
     },
 )
 
-#app.mount("/static", StaticFiles(directory="burningbackend/app/static"), name="static")
-
 app.include_router(api.router)
 
-@app.get("/api/v1/health", tags=["health"])
-async def health() -> dict:
-    return {"status": "ok"}
-
 if settings.CORS_ORIGINS:
-    from fastapi.middleware.cors import CORSMiddleware
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
@@ -44,4 +36,3 @@ if settings.CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
