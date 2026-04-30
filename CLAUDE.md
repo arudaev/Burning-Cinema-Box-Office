@@ -95,10 +95,14 @@ The `docs/` directory is the ground truth for this project. Read these before ma
 - Config: `src/burningbackend/app/core/config.py` — `Settings` via `pydantic-settings` v2 (`model_config = ConfigDict(...)`); `SECRET_KEY` and `MONGODB_URI` must be supplied via env — no unsafe defaults
 - Database: `src/burningbackend/app/db/init_db.py` — initialises Beanie with Motor (async MongoDB), creates default superuser on first run
 - Models: `src/burningbackend/app/models/` — Beanie `Document` subclasses (Movie, Inventory, History, Reservation, User)
+- Auth: `core/security.py` (bcrypt + JWT HS256), `core/deps.py` (`get_current_user`, `get_current_superuser` FastAPI dependencies)
+- Auth endpoints: `POST /api/v1/auth/token` (OAuth2 password grant), `POST /api/v1/auth/refresh`
+- All write endpoints require a bearer token; GET endpoints are public
 - API routes: `src/burningbackend/app/api/v1/endpoints/` — one file per resource, all under `/api/v1/<resource>`
-  - `movies`, `inventory`, `history`, `reservation`, `report`
+  - `auth`, `movies`, `inventory`, `history`, `reservation`, `report`
 - Health check: `GET /api/v1/health` → `{"status": "ok"}` (used by Railway)
 - OpenAPI docs served at `/api/v1/docs/`
+- Beanie serialises document IDs as `"_id"` (not `"id"`) in FastAPI JSON responses
 
 ### Frontend
 

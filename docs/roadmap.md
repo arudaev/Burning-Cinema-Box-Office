@@ -83,54 +83,25 @@ Deployment moves to: **Cloudflare Pages** · **Railway** · **MongoDB Atlas**
 
 ---
 
-### Phase 1 — Backend rewrite  `feat/backend-rewrite`
+### Phase 1 — Backend rewrite  `feat/backend-rewrite` ✅ COMPLETE
 **Goal:** Clean, tested, authenticated API with correct models.
-**Single large branch; merged when all tests pass.**
+**PR:** [#7](https://github.com/arudaev/Burning-Cinema-Box-Office/pull/7) — 37 tests passing, smoke-tested against Docker stack.
 
-#### Models (what changes)
+**What shipped:**
+- Models: Inventory (vat_rate, is_deposit, requires_deposit, active), History (transaction_id UUID, staff_id, vat_breakdown, is_deposit + vat_rate on Product snapshot), Reservation (retention_until, scan_timestamp), Movie (active, remove stripe_payment)
+- Auth: JWT HS256 bearer tokens on all write endpoints; `POST /api/v1/auth/token` (OAuth2 password grant) + `POST /api/v1/auth/refresh`; `core/deps.py` with `get_current_user` / `get_current_superuser`
+- Business logic: `is_deposit` flag replaces `name == "Pfand"` in `/history/total`; stock guard (HTTP 422) on `/inventory/sold`; soft-delete movies (`active=False`); `retention_until` computed from `movie.datetime + 30 days`; `scan_timestamp` set on scan
+- Report: `movie` now optional; `start_date` / `end_date` params for cross-movie aggregation
+- Config: `@model_validator` raises if `FIRST_SUPERUSER_PASSWORD == "changeme"` in production
+- Fixed: NameError crash in `PUT /reservation/update` (undefined `req`)
+- Tests: 37 tests across `test_auth`, `test_movies`, `test_inventory`, `test_history`, `test_reservation`, `test_report` — mongomock-motor (no real DB in CI)
+- New deps: `python-jose[cryptography]`, `bcrypt`, `python-multipart`; dev: `pytest-asyncio`, `httpx`, `mongomock-motor`
+- `docker-compose.test.yml`: changed `DEBUG=false` → `DEBUG=true` to bypass production password guard on local stack
 
-**Inventory** — add:
-- `vat_rate: float` (7.0 or 19.0 — required, no default)
-- `is_deposit: bool = False` (replaces hardcoded `"Pfand"` string check)
-- `requires_deposit: bool = False` (replaces hardcoded `"Drinks"` category check)
-- `active: bool = True` (soft-disable instead of delete)
-
-**History (Order)** — add:
-- `transaction_id: UUID` (auto-generated, immutable)
-- `staff_id: Optional[PydanticObjectId]` (who processed the sale)
-- `vat_breakdown: list[VatLine]` (per-rate totals for GoBD compliance)
-- No DELETE endpoint. Cancellation flag only. Already present — keep it.
-
-**Reservation** — add:
-- `retention_until: datetime` (set to `movie.datetime + 30 days` at creation)
-- `scan_timestamp: Optional[datetime]`
-- Remove duplicate email → keep for now (no user accounts in scope)
-
-**Movie** — add:
-- `active: bool = True` (soft-disable — no hard DELETE)
-- Remove `stripe_payment` field (not in scope per product.md)
-
-#### Config fixes
-- ~~`SECRET_KEY` must load from env, not `secrets.token_urlsafe()` at import time~~ ✅ done
-- ~~`DEBUG` default → `False`~~ ✅ done
-- ~~Pydantic v2 `model_config = ConfigDict(env_file=".env")` pattern~~ ✅ done
-- `FIRST_SUPERUSER_PASSWORD` default → raise error if not set in production
-
-#### Authentication
-- JWT bearer tokens on all write endpoints
-- Read endpoints (GET /movies, GET /inventory) remain public — cashier loads products without login
-- Auth endpoints: `POST /api/v1/auth/token`, `POST /api/v1/auth/refresh`
-
-#### Business logic fixes
-- Replace all hardcoded product name strings with model flags (`is_deposit`, `requires_deposit`)
-- Report endpoint: add `start_date` / `end_date` query params for cross-movie date-range aggregation
-- Inventory sold endpoint: guard against `amount < 0`
-- Movies: replace DELETE with `active = False`
-
-#### Tests (pytest + pytest-asyncio + httpx)
-- One test file per endpoint group
-- Cover: happy path, auth failures, validation errors, Pfand flag logic, report date ranges
-- Target: all critical business rules from `docs/domain.md` are tested
+**Verification notes:**
+- Beanie serialises document ID as `"_id"` (not `"id"`) in FastAPI JSON responses — tests use `["data"]["_id"]`
+- `poetry.lock` is committed intentionally — this is an application, not a library; CI and Railway both depend on it
+- Local tests run via Docker: `docker run --rm -v ... python:3.11-slim bash -c "pip install poetry==1.8.2 && poetry install --with dev && poetry run pytest"` (poetry not installed on dev machine)
 
 ---
 
