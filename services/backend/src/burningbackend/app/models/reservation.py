@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from beanie import Document, Indexed
-from pydantic.fields import Field
+from beanie import Document
 from pydantic import BaseModel
 
 
@@ -12,6 +11,8 @@ class Reservation(Document):
     seat_number: int
     email: str
     scanned: bool = False
+    retention_until: datetime
+    scan_timestamp: Optional[datetime] = None
 
     class Settings:
         name = "reservations"

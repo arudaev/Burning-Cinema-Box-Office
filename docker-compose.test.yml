@@ -8,7 +8,7 @@ services:
     environment:
       MONGODB_URI: mongodb://mongo:27017/
       MONGODB_DB_NAME: burningregister
-      DEBUG: "false"
+      DEBUG: "true"
       SECRET_KEY: test-secret-key-for-local-testing-only
       FIRST_SUPERUSER: admin
       FIRST_SUPERUSER_EMAIL: admin@example.com

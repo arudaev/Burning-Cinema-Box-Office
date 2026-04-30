@@ -1,4 +1,4 @@
-from pydantic import EmailStr
+from pydantic import EmailStr, model_validator
 from pydantic.config import ConfigDict
 from pydantic_settings import BaseSettings
 
@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # Authentication — SECRET_KEY has no default; must be supplied via env var
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1
     SECRET_KEY: str
+
+    @model_validator(mode="after")
+    def check_superuser_password(self) -> "Settings":
+        if not self.DEBUG and self.FIRST_SUPERUSER_PASSWORD == "changeme":
+            raise ValueError("FIRST_SUPERUSER_PASSWORD must be changed in production")
+        return self
 
 
 settings = Settings()
