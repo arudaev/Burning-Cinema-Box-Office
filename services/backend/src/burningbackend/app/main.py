@@ -30,6 +30,10 @@ app = FastAPI(
 
 app.include_router(api.router)
 
+@app.get("/api/v1/health", tags=["health"])
+async def health() -> dict:
+    return {"status": "ok"}
+
 if settings.CORS_ORIGINS:
     from fastapi.middleware.cors import CORSMiddleware
 

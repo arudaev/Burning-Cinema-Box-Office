@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: snok/install-poetry@v1
+        with:
+          version: "1.8.2"
+          virtualenvs-in-project: true
+
+      - name: Cache virtualenv
+        uses: actions/cache@v4
+        with:
+          path: services/backend/.venv
+          key: venv-${{ hashFiles('services/backend/poetry.lock') }}
+
+      - run: poetry install --with dev
+
+      - run: poetry run pytest --tb=short
+
+  frontend:
+    name: Frontend lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: services/frontend/node_modules
+          key: bun-${{ hashFiles('services/frontend/bun.lockb') }}
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run lint
