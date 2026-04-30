@@ -5,7 +5,7 @@ builder = "nixpacks"
 nixPkgs = ["python311", "poetry"]
 
 [deploy]
-startCommand = "poetry run python -m burningbackend"
+startCommand = "/opt/venv/bin/python -m burningbackend"
 healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
